@@ -107,5 +107,22 @@ namespace Task_Manager
             sb.AppendLine(string.Format("Total processes      {0:N0}", counter));
             label2.Text = sb.ToString();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string id = listBox1.Text;
+            id = id.Substring(id.IndexOf("Id:") + 3);
+            Process.GetProcessById(Convert.ToInt32(id)).Kill();
+            int lb_id = listBox1.SelectedIndex;
+            for (int n = listBox1.Items.Count - 1; n >= 0; --n)
+            {
+                string removelistitem = id;
+                if (listBox1.Items[n].ToString().Contains(removelistitem))
+                {
+                    listBox1.Items.RemoveAt(n);
+                }
+            }
+        }
+
     }
 }
