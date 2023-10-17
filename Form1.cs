@@ -24,7 +24,7 @@ namespace Task_Manager
             var processes = Process.GetProcesses();
             foreach (var process in processes)
             {
-                richTextBox1.Text += $"Name: {process.ProcessName} Id:{process.Id}\n";
+                listBox1.Items.Add($"Name: {process.ProcessName} Id:{process.Id}");
             }
         }
         private void SetTimer()
@@ -37,22 +37,23 @@ namespace Task_Manager
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            Action safeWrite = richTextBox1.Clear;
-            richTextBox1.Invoke(safeWrite);
+            
+            Action safeWrite = listBox1.Items.Clear;
+            listBox1.Invoke(safeWrite);
             
             var processes = Process.GetProcesses();
             foreach (var process in processes)
             {
 
                 Action safeWrite1 = delegate { Wr(process.ProcessName, Convert.ToString(process.Id)); };
-                richTextBox1.Invoke(safeWrite1);
+                listBox1.Invoke(safeWrite1);
 
             }
             Thread.Sleep(Convert.ToInt32(textBox1.Text));
         }
         private void Wr(string PN, string ID)
         {
-            richTextBox1.Text += $"Name: {PN} Id:{ID}\n";
+            listBox1.Items.Add($"Name: {PN} Id:{ID}");
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -62,6 +63,49 @@ namespace Task_Manager
                 aTimer.Stop();
             }
             SetTimer();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string id = listBox1.Text;
+            string name = id.Substring(id.IndexOf("Name:") + 6, id.IndexOf("Id:") - 7);
+            id = id.Substring(id.IndexOf("Id:")+3);
+
+            var currentProcess = Process.GetProcessById(Convert.ToInt32(id));
+            
+
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+
+
+            sb.AppendLine("Process information");
+            sb.AppendLine("-------------------");
+            sb.AppendLine("CPU time");
+            sb.AppendLine(string.Format("\tTotal       {0}",
+                currentProcess.TotalProcessorTime));
+            sb.AppendLine(string.Format("\tUser        {0}",
+                currentProcess.UserProcessorTime));
+            sb.AppendLine(string.Format("\tPrivileged  {0}",
+                currentProcess.PrivilegedProcessorTime));
+            sb.AppendLine("Memory usage");
+            sb.AppendLine(string.Format("\tCurrent     {0:N0} B", currentProcess.WorkingSet64));
+            sb.AppendLine(string.Format("\tPeak        {0:N0} B", currentProcess.PeakWorkingSet64));
+            sb.AppendLine(string.Format("Active threads      {0:N0}", currentProcess.Threads.Count));
+            var n_processes = Process.GetProcessesByName(name);
+            int counter = 0;
+            foreach ( var pr in n_processes)
+            {
+                counter++;
+            }
+            sb.AppendLine(string.Format("Process name coppies      {0:N0}", counter));
+            counter = 0;
+            foreach (var pr in Process.GetProcesses())
+            {
+                counter++;
+            }
+            sb.AppendLine(string.Format("Total processes      {0:N0}", counter));
+            label2.Text = sb.ToString();
         }
     }
 }
